@@ -1,0 +1,13 @@
+{
+  "name": "schedulebot",
+  "version": "0.0.1",
+  "description": "schedulebot",
+  "dependencies": {
+    "express": "^4.13.1",
+    "request": "^2.58.0"
+  },
+  "scripts": {
+    "start": "node app.js"
+  },
+  "main": "app.js"
+}
