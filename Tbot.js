@@ -14,7 +14,7 @@ function Tbot(config, parsingFunction){
     //function for parsing the message
     this.parse = parsingFunction;
     //state object for storing state
-    this.state = {num: 0};
+    this.state = {};
 
     // Request to Telegram API
     //params:

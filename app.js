@@ -30,9 +30,6 @@ app.get('/',function(req, res){
 // Execute
 var ksamiBot = new Tbot(config, function(msg){
     var returnMessage = '';
-    //debug
-    this.state.num += 1;
-    returnMessage += this.state.num + ':\n';
 
     if(typeof msg !== "undefined" && msg.charAt(0) === '/') {
         text = msg.split(' ');
