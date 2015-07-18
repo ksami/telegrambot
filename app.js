@@ -3,23 +3,55 @@
  */
 
 // Environment configurables
-var port = process.env.OPENSHIFT_NODEJS_PORT || 5000;
-var ipaddress = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
+// var port = process.env.OPENSHIFT_NODEJS_PORT || 5000;
+// var ipaddress = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
 
 // Dependencies
 var config = require('./.config/config.json');
 var request = require('request');
-var express = require('express');
-var app = express();
-var http = require('http').Server(app);
+// var express = require('express');
+// var app = express();
+// var http = require('http').Server(app);
 
 // Use files from folder 'www'
 // app.use(express.static('www'));
 
-var URL = 'https://api.telegram.org/bot';
+var URL = config.url;
 var TOKEN = config.token;
-var _methods = ['getMe', 'getUpdates'];
+var TIMEOUT = config.timeout;
+var QUIET = config.isQuiet;
+
 var _updatesOffset = 0;
+var _chatId = '';
+
+
+
+//execute
+setInterval(function(){
+    getUpdates(processUpdates);
+}, TIMEOUT*1000);
+
+
+
+
+
+
+function sendMessage(msg){
+    requestTelegram('sendMessage', '?chat_id='+_chatId, '&text='+msg);
+}
+
+
+function getUpdates(callback){
+    requestTelegram('getUpdates', '', '?offset='+_updatesOffset, callback);
+}
+
+
+function getMe(callback){
+    requestTelegram('getMe', '', '', function(){
+        console.log(body);
+    });
+}
+
 
 function parse(msg){
     var returnMessage = '';
@@ -28,61 +60,63 @@ function parse(msg){
         text = msg.split(' ');
         command = text[0];
 
-        if(command == '/start'){
-            returnMessage = 'Welcome! This is a weird bot!';
+        if(command == '/start' || command == '/help'){
+            returnMessage += '/roll x - to obtain a number between 1 and x (eg. /roll 6)\n';
+            returnMessage += '/help to see this message again';
         }
-        else if(command == '/help'){
-            returnMessage = 'Use /help to obtain a list of commands';
+        else if(command == '/ksami'){
+            returnMessage = 'ksami is cool, ksami is great, ksami is rated ten out of eight';
         }
         else if(command == '/haha'){
             returnMessage = 'Haha yourself';
+        }
+        else if(command == '/roll'){
+            var max = parseInt(text[1]);
+
+            if(!isNaN(max) && max >= 1){
+                returnMessage = 'Rolling a ' + max + '-sided die...\n';
+                returnMessage += 'Result is: ';
+                returnMessage += (Math.floor((Math.random() * max) + 1)).toString();
+            }
+            else{
+                returnMessage = 'Please enter a number more than 0 (eg. /roll 6)';
+            }
         }
     }
     return returnMessage;
 }
 
 
+function processUpdates(body){
+    for (var i = 0; i < body.result.length; i++) {
+        var update = body.result[i];
 
-//TODO: stopped here, next step to send a message
-requestTelegram(_methods[1], function(err, body){
-    try{
-        if(!err){
-            console.log(body);
-            if(body.ok){
-                for (var i = 0; i < body.result.length; i++) {
-                    var update = body.result[i];
-                    _updatesOffset = update.update_id;
+        if(update.update_id >= _updatesOffset){
+            _updatesOffset = update.update_id + 1;
+        }
 
-                    if(update.hasOwnProperty('message')){
-                        if(update.message.hasOwnProperty('text')){
-                            console.log(parse(update.message.text));
-                        }
-                        else{
-                            throw 'Error: no text';
-                        }
-                    }
-                    else{
-                        throw 'Error: no message';
-                    }
+        if(update.hasOwnProperty('message')){
+            _chatId = update.message.chat.id;
 
-                }
+            if(update.message.hasOwnProperty('text')){
+                var reply = parse(update.message.text);
+                sendMessage(reply);
             }
             else{
-                throw 'Error: body.ok false';
+                throw new Error('no text');
             }
         }
         else{
-            console.log(err);
+            //no message
         }
+
     }
-    catch(e){
-        console.log(e);
-    }
-});
+}
 
 
-function requestTelegram(method, callback){
-    var req = URL + TOKEN + '/' + method;
+function requestTelegram(method, chatIdStr, param, callback){
+    var cb = callback || function(body){ if(!QUIET) console.log(body); };
+    var req = URL + TOKEN + '/' + method + chatIdStr + param;
 
     // Request to Telegram API
     request({
@@ -90,22 +124,39 @@ function requestTelegram(method, callback){
         url: req,
         json: true
     }, function(err, res, body){
-        if(!err && res.statusCode == 200){
-            callback(null, body);
+        try{
+            if(!err && res.statusCode == 200){
+                if(body.ok){
+                    
+                    cb(body);
+                    
+                }
+                else{
+                    throw new Error('body not ok');
+                }   
+            }
+            else{
+                if(err){
+                    throw new Error(err.toString());
+                }
+                else{
+                    throw new Error('response code is ' + res.statusCode);
+                }
+            }
         }
-        else{
-            callback(err, body);
+        catch(e){
+            console.log('Error: ' + e.message);
         }
     });
 }
 
 
-// Listen to <port>
-http.listen(port, ipaddress, function(){
-    console.log('listening on ' + ipaddress + ':' + port);
-});
+// // Listen to <port>
+// http.listen(port, ipaddress, function(){
+//     console.log('listening on ' + ipaddress + ':' + port);
+// });
 
-// Route handlers
-app.get('/',function(req, res){
-    res.send('Hello World');
-});
+// // Route handlers
+// app.get('/',function(req, res){
+//     res.send('Hello World');
+// });
