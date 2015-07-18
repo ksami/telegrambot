@@ -1,7 +1,7 @@
 {
-  "name": "schedulebot",
+  "name": "ksamibot",
   "version": "0.0.1",
-  "description": "schedulebot",
+  "description": "ksamibot",
   "dependencies": {
     "express": "^4.13.1",
     "request": "^2.58.0"
