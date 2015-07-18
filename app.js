@@ -9,9 +9,9 @@ var ipaddress = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
 // Dependencies
 var config = require('./.config/config.json');
 var request = require('request');
-var express = require('express');
-var app = express();
-var http = require('http').Server(app);
+// var express = require('express');
+// var app = express();
+// var http = require('http').Server(app);
 
 // Use files from folder 'www'
 // app.use(express.static('www'));
@@ -151,12 +151,12 @@ function requestTelegram(method, chatIdStr, param, callback){
 }
 
 
-// Listen to <port>
-http.listen(port, ipaddress, function(){
-    console.log('listening on ' + ipaddress + ':' + port);
-});
+// // Listen to <port>
+// http.listen(port, ipaddress, function(){
+//     console.log('listening on ' + ipaddress + ':' + port);
+// });
 
-// Route handlers
-app.get('/',function(req, res){
-    res.send('Hi there!');
-});
+// // Route handlers
+// app.get('/',function(req, res){
+//     res.send('Hi there!');
+// });
