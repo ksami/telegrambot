@@ -38,7 +38,7 @@ module.exports.parse = function(message){
 
     if(typeof msg !== "undefined") {
         text = msg.split(' ');
-        command = text[0];
+        command = text[0].split('@')[0];
 
 
         if(command == '/start' || command == '/help'){
