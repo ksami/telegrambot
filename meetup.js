@@ -202,7 +202,9 @@ module.exports.parse = function(message){
                     var times = text[2].split(',');
                     var places = text[4].split(',');
                     var timeOpts = [];
+                    var placeOpts = [];
 
+                    //checks
                     for(var i=0; i<times.length; i++){
                         var timeOpt = parseInt(times[i]);
                         if(isNaN(timeOpt) || timeOpt<0 || timeOpt>meetup.times.length){
@@ -211,20 +213,35 @@ module.exports.parse = function(message){
                         //actually storing the choices deferred to below
                         //in case error occurs while parsing placeOpt
                         //then entire /respond command should fail
+                        //also to check before deleting
                         timeOpts.push(timeOpt);
                     }
-
                     for(var j=0; j<places.length; j++){
                         var placeOpt = parseInt(places[j]);
                         if(isNaN(placeOpt) || placeOpt<0 || placeOpt>meetup.places.length){
                             throw new Error(this.STRINGS.ERROR.NAN);
                         }
-                        meetup.places[placeOpt-1].votes[userId] = userName;
+                        placeOpts.push(placeOpt);
                     }
+
+                    //deletes all user votes first
+                    for(var x=0; x<meetup.times.length; x++){
+                        delete meetup.times[x].votes[userId];
+                    }
+                    for(var y=0; y<meetup.places.length; y++){
+                        delete meetup.places[y].votes[userId];
+                    }
+
+                    //store votes
                     for(var k=0; k<timeOpts.length; k++){
                         var timeOpt = timeOpts[k];
                         meetup.times[timeOpt-1].votes[userId] = userName;
                     }
+                    for(var m=0; m<placeOpts.length; m++){
+                        var placeOpt = placeOpts[m];
+                        meetup.places[placeOpt-1].votes[userId] = userName;
+                    }
+
                     //success
                     returnMessage += this.STRINGS.RESPOND + userName;
                 }
