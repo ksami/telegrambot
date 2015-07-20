@@ -1,7 +1,7 @@
 module.exports.STRINGS = {
     HELP : 'Use /newmeetup to start planning a new meetup\n' + 
             '/view - view choices for the meetup\n' +
-            '/respond time 1,2,3 place 1,2 - to indicate which options you want\n' +
+            '/respond time [t1,t2...] place [p1,p2...] - to respond (eg. /respond time 1,3,4 place 1,2)\n' +
             '/results - to see results\n' +
             '/cancel - cancel creation of the new meetup\n' +
             '/end - stop accepting responses and display results',
@@ -9,7 +9,7 @@ module.exports.STRINGS = {
     DONE : 'Done! Waiting for responses...',
     RESPOND : 'Received response from ',
     VIEW :  '/view - view options for the meetup\n' +
-            '/respond time 1,3,4 place 1,2 - to respond\n' +
+            '/respond time [t1,t2...] place [p1,p2...] - to respond (eg. /respond time 1,3,4 place 1,2)\n' +
             '/results - to see results\n' +
             '/end - stop accepting responses and display results',
     CANCEL : 'Operation cancelled',
@@ -26,7 +26,8 @@ module.exports.STRINGS = {
         CREATOR : 'Only the creator of the meetup is allowed to add/modify details',
         ONE : 'Only one meetup is allowed to be in progress, use /cancel to cancel creation or /end to stop accepting responses and display results',
         NAN : 'Please enter numbers belonging to one of the options',
-        FORMAT: 'Please follow the format /respond time 1,3,4 place 1,2'
+        FORMAT: 'Please follow the format /respond time [t1,t2...] place [p1,p2...]\n' +
+                '(eg. /respond time 1,3,4 place 1,2)'
     }
 };
 
