@@ -1,7 +1,7 @@
 module.exports.STRINGS = {
     HELP : 'Use /newmeetup to start planning a new meetup\n' + 
             '/view - view choices for the meetup\n' +
-            '/respond time 1,2,3 place 1,2 - to respond\n' +
+            '/respond time 1,2,3 place 1,2 - to indicate which options you want\n' +
             '/results - to see results\n' +
             '/cancel - cancel creation of the new meetup\n' +
             '/end - stop accepting responses and display results',
@@ -314,7 +314,7 @@ module.exports.parse = function(message){
             }
             else{
                 //unknown /command or has not run /newmeetup yet
-                returnMessage += this.STRINGS.HELP;
+                //or not a message for this bot
             }
         }
     }
