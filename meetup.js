@@ -23,6 +23,7 @@ module.exports.STRINGS = {
         AGAIN : 'Please enter another place for the meeting or use /next to finish'
     },
     ERROR : {
+        CREATOR : 'Only the creator of the meetup is allowed to add/modify details',
         ONE : 'Only one meetup is allowed to be in progress, use /cancel to cancel creation or /end to stop accepting responses and display results',
         NAN : 'Please enter numbers belonging to one of the options',
         FORMAT: 'Please follow the format /respond time 1,3,4 place 1,2'
@@ -51,6 +52,7 @@ module.exports.parse = function(message){
             //if this chat has never run /newmeetup before
             if(!(this.state.meetups.hasOwnProperty(message.chat.id))){
                 this.state.meetups[message.chat.id] = {
+                    creator: message.from.id,
                     isOngoing: false,
                     isCreating: true,
                     isTime: false,
@@ -117,6 +119,7 @@ module.exports.parse = function(message){
                 var meetup = this.state.meetups[message.chat.id];
                 if(!(meetup.isOngoing && meetup.isCreating)){
                     meetup = {
+                        creator: message.from.id,
                         isOngoing: false,
                         isCreating: true,
                         isTime: false,
@@ -140,28 +143,34 @@ module.exports.parse = function(message){
                 this.state.meetups[message.chat.id].isCreating ){
 
                 var meetup = this.state.meetups[message.chat.id];
-                if(meetup.isTime){
-                    //just finished all time options, going on to places
-                    meetup.isTime = false;
-                    meetup.isPlace = true;
+                if(message.from.id == meetup.creator){
+                    if(meetup.isTime){
+                        //just finished all time options, going on to places
+                        meetup.isTime = false;
+                        meetup.isPlace = true;
 
-                    returnMessage += this.STRINGS.PLACE.FIRST;
-                }
-                else if(meetup.isPlace){
-                    //just finished all place options, done
-                    meetup.isPlace = false;
-                    meetup.isCreating = false;
-                    meetup.isOngoing = true;
+                        returnMessage += this.STRINGS.PLACE.FIRST;
+                    }
+                    else if(meetup.isPlace){
+                        //just finished all place options, done
+                        meetup.isPlace = false;
+                        meetup.isCreating = false;
+                        meetup.isOngoing = true;
 
-                    returnMessage += this.STRINGS.DONE;
-                    returnMessage += '\n';
-                    returnMessage += '\n' + meetup.viewDetails();
-                    returnMessage += '\n';
-                    returnMessage += '\n' + this.STRINGS.VIEW;
+                        returnMessage += this.STRINGS.DONE;
+                        returnMessage += '\n';
+                        returnMessage += '\n' + meetup.viewDetails();
+                        returnMessage += '\n';
+                        returnMessage += '\n' + this.STRINGS.VIEW;
+                    }
+                    else{
+                        //invalid state, should not reach ((；゜A゜))
+                        returnMessage += this.STRINGS.HELP;
+                    }
                 }
                 else{
-                    //invalid state, should not reach ((；゜A゜))
-                    returnMessage += this.STRINGS.HELP;
+                    //not creator
+                    returnMessage += this.STRINGS.ERROR.CREATOR;
                 }
             }
             else{
@@ -275,8 +284,14 @@ module.exports.parse = function(message){
                 this.state.meetups.hasOwnProperty(message.chat.id) &&
                 this.state.meetups[message.chat.id].isCreating ){
 
-                this.state.meetups[message.chat.id] = {};
-                returnMessage += this.STRINGS.CANCEL;
+                if(message.from.id == this.state.meetups[message.chat.id].creator){
+                    this.state.meetups[message.chat.id] = {};
+                    returnMessage += this.STRINGS.CANCEL;
+                }
+                else{
+                    //not creator
+                    returnMessage += this.STRINGS.ERROR.CREATOR;
+                }
             }
             else{
                 //creation not in progress or has not run /newmeetup yet
@@ -306,28 +321,35 @@ module.exports.parse = function(message){
                 this.state.meetups[message.chat.id].isCreating ){
 
                 var meetup = this.state.meetups[message.chat.id];
-                if( meetup.title === '' &&
-                    !(meetup.isTime) &&
-                    !(meetup.isPlace) ){
-                    //adding title
-                    meetup.title = msg;
-                    meetup.isTime = true;
-                    returnMessage += this.STRINGS.TIME.FIRST;
-                }
-                else if(meetup.isTime){
-                    //adding time
-                    meetup.times.push({text: msg, votes: {}});
-                    returnMessage += this.STRINGS.TIME.AGAIN;
-                }
-                else if(meetup.isPlace){
-                    //adding place
-                    meetup.places.push({text: msg, votes: {}});
-                    returnMessage += this.STRINGS.PLACE.AGAIN;
+                if(message.from.id == meetup.creator){
+                    if( meetup.title === '' &&
+                        !(meetup.isTime) &&
+                        !(meetup.isPlace) ){
+                        //adding title
+                        meetup.title = msg;
+                        meetup.isTime = true;
+                        returnMessage += this.STRINGS.TIME.FIRST;
+                    }
+                    else if(meetup.isTime){
+                        //adding time
+                        meetup.times.push({text: msg, votes: {}});
+                        returnMessage += this.STRINGS.TIME.AGAIN;
+                    }
+                    else if(meetup.isPlace){
+                        //adding place
+                        meetup.places.push({text: msg, votes: {}});
+                        returnMessage += this.STRINGS.PLACE.AGAIN;
+                    }
+                    else{
+                        //invalid state, should not reach ((；゜A゜))
+                        returnMessage += this.STRINGS.HELP;
+                    }
                 }
                 else{
-                    //invalid state, should not reach ((；゜A゜))
-                    returnMessage += this.STRINGS.HELP;
+                    //not creator
+                    returnMessage += this.STRINGS.ERROR.CREATOR;
                 }
+
             }
             else{
                 //unknown /command or has not run /newmeetup yet
