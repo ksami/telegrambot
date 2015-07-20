@@ -1,12 +1,14 @@
 var request = require('request');
 
-function Tbot(config, parsingFunction){
+function Tbot(config, parsingFunction, STRINGS){
     var self = this;
 
     this.URL = config.url;
     this.TOKEN = config.token;
     this.TIMEOUT = config.timeout;
     this.QUIET = config.isQuiet;
+
+    this.STRINGS = STRINGS;
 
     this._updatesOffset = 0;
     this._chatId = '';
@@ -25,6 +27,8 @@ function Tbot(config, parsingFunction){
     this.sendRequest = function(method, chatIdStr, param, callback){
         var cb = callback || function(body){ if(!self.QUIET) console.log(body); };
         var req = self.URL + self.TOKEN + '/' + method + chatIdStr + param;
+        //debug
+        console.log(req);
 
         request({
             method: 'GET',
@@ -70,7 +74,7 @@ function Tbot(config, parsingFunction){
                 self._chatId = update.message.chat.id;
 
                 if(update.message.hasOwnProperty('text')){
-                    var reply = self.parse(update.message.text);
+                    var reply = self.parse(update.message);
                     self.sendMessage(reply);
                 }
                 else{
