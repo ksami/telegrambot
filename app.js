@@ -30,45 +30,51 @@ app.get('/',function(req, res){
 
 
 // Execute
-var meetupBot = new Tbot(config, meetup.parse, meetup.STRINGS);
+var meetupBot = new Tbot(config['meetup'], meetup.parse, meetup.STRINGS);
  
-// var ksamiBot = new Tbot(config, function(message){
-//     var msg = message.text;
-//     var returnMessage = '';
+var ksamiBot = new Tbot(config['ksami'], function(message){
+    var msg = message.text;
+    var returnMessage = '';
 
-//     if(typeof msg !== "undefined" && msg.charAt(0) === '/') {
-//         text = msg.split(' ');
-//         command = text[0];
+    if(typeof msg !== 'undefined' && msg.charAt(0) === '/') {
+        text = msg.split(' ');
+        command = text[0];
 
-//         if(command == '/start' || command == '/help'){
-//             returnMessage += '/roll x - to obtain a number between 1 and x (eg. /roll 6)\n';
-//             returnMessage += '/help to see this message again';
-//         }
-//         else if(command == '/ksami'){
-//             returnMessage += 'ksami is cool, ksami is great, ksami is rated ten out of eight';
-//         }
-//         else if(command == '/haha'){
-//             returnMessage += 'Haha yourself';
-//         }
-//         else if(command == '/roll'){
-//             var max = parseInt(text[1]);
+        if(command == '/start' || command == '/help'){
+            returnMessage += '/roll x - to obtain a number between 1 and x (eg. /roll 6)\n';
+            returnMessage += '/help to see this message again';
+        }
+        else if(command == '/ksami'){
+            returnMessage += 'ksami is cool, ksami is great, ksami is rated ten out of eight';
+        }
+        else if(command == '/haha'){
+            returnMessage += 'Haha yourself';
+        }
+        else if(command == '/roll'){
+            var max = parseInt(text[1]);
 
-//             if(!isNaN(max) && max >= 1){
-//                 returnMessage += 'Rolling a ' + max + '-sided die...\n';
-//                 returnMessage += 'Result is: ';
-//                 returnMessage += (Math.floor((Math.random() * max) + 1)).toString();
-//             }
-//             else{
-//                 returnMessage += 'Please enter a number more than 0 (eg. /roll 6)';
-//             }
-//         }
-//         else{
-//             //unknown command
-//         }
-//     }
-//     return returnMessage;
-// });
+            if(!isNaN(max) && max >= 1){
+                returnMessage += 'Rolling a ' + max + '-sided die...\n';
+                returnMessage += 'Result is: ';
+                returnMessage += (Math.floor((Math.random() * max) + 1)).toString();
+            }
+            else{
+                returnMessage += 'Please enter a number more than 0 (eg. /roll 6)';
+            }
+        }
+        else{
+            //unknown command
+            returnMessage += 'Unknown command, type /help to see a list of commands';
+        }
+    }
+    return returnMessage;
+});
+
 
 setInterval(function(){
     meetupBot.getUpdates();
 }, meetupBot.TIMEOUT*1000);
+
+setInterval(function(){
+    ksamiBot.getUpdates();
+}, ksamiBot.TIMEOUT*1000);

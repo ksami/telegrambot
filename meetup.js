@@ -84,29 +84,59 @@ module.exports.parse = function(message){
                 this.state.meetups[message.chat.id].viewResults = function(){
                     var returnText = '';
 
+                    //find max
+                    var maxTime = (Object.keys(this.times[0].votes)).length;
+                    var maxPlace = (Object.keys(this.places[0].votes)).length;
+
+                    for(var i=1; i<this.times.length; i++){
+                        if((Object.keys(this.times[i].votes)).length > maxTime){
+                            maxTime = (Object.keys(this.times[i].votes)).length;
+                        }
+                    }
+                    for(var j=1; j<this.places.length; j++){
+                        if((Object.keys(this.places[j].votes)).length > maxPlace){
+                            maxPlace = (Object.keys(this.places[j].votes)).length;
+                        }
+                    }
+
+                    //format
                     returnText += this.title;
                     returnText += '\n-----';
                     returnText += '\nTimes:';
                     for(var i=0; i<this.times.length; i++){
+                        var votes = Object.keys(this.times[i].votes);
+                        var emphasis = '';
+                        if(votes.length == maxTime){
+                            emphasis = '**';
+                        }
+
                         returnText += '\n' + (i+1) + '. ' + this.times[i].text +
-                                        ' (' + (Object.keys(this.times[i].votes)).length + ' votes): ';
-                        for(var k=0; k<(Object.keys(this.times[i].votes)).length; k++){
+                                        ' (' + emphasis + votes.length + ' votes' +
+                                            emphasis + '): ';
+                        for(var k=0; k<votes.length; k++){
                             if(k>0){
                                 returnText += ', ';
                             }
-                            returnText += this.times[i].votes[ ((Object.keys(this.times[i].votes))[k]) ];
+                            returnText += this.times[i].votes[ votes[k] ];
                         }
                     }
                     returnText += '\n';
                     returnText += '\nPlaces:';
                     for(var j=0; j<this.places.length; j++){
+                        var votes = Object.keys(this.places[j].votes);
+                        var emphasis = '';
+                        if(votes.length == maxPlace){
+                            emphasis = '**';
+                        }
+
                         returnText += '\n' + (j+1) + '. ' + this.places[j].text +
-                                        ' (' + (Object.keys(this.places[j].votes)).length + ' votes): ';
-                        for(var m=0; m<(Object.keys(this.places[j].votes)).length; m++){
+                                        ' (' + emphasis + votes.length + ' votes' +
+                                            emphasis + '): ';
+                        for(var m=0; m<votes.length; m++){
                             if(m>0){
                                 returnText += ', ';
                             }
-                            returnText += this.places[j].votes[ ((Object.keys(this.places[j].votes))[m]) ];
+                            returnText += this.places[j].votes[ votes[m] ];
                         }
                     }
 
