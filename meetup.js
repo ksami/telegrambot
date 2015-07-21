@@ -4,7 +4,9 @@ module.exports.STRINGS = {
             '/respond time [t1,t2...] place [p1,p2...] - to respond (eg. /respond time 1,3,4 place 1,2)\n' +
             '/results - to see results\n' +
             '/cancel - cancel creation of the new meetup\n' +
-            '/end - stop accepting responses and display results',
+            '/end - stop accepting responses and display results\n' +
+            '/help - view list of commands\n\n' +
+            'Rate this bot at https://telegram.me/storebot?start=meetup_bot',
     TITLE : 'Please enter a title for the meetup',
     DONE : 'Done! Waiting for responses...',
     RESPOND : 'Received response from ',
