@@ -27,8 +27,6 @@ function Tbot(config, parsingFunction, STRINGS){
     this.sendRequest = function(method, chatIdStr, param, callback){
         var cb = callback || function(body){ if(!self.QUIET) console.log(body); };
         var req = self.URL + self.TOKEN + '/' + method + chatIdStr + param;
-        //debug
-        console.log(req);
 
         request({
             method: 'GET',
@@ -75,7 +73,12 @@ function Tbot(config, parsingFunction, STRINGS){
 
                 if(update.message.hasOwnProperty('text')){
                     var reply = self.parse(update.message);
-                    self.sendMessage(reply);
+                    if(reply !== '' || typeof reply !=='undefined'){
+                        self.sendMessage(reply);
+                    }
+                    else{
+                        //no reply to send
+                    }
                 }
                 else{
                     throw new Error('no text');

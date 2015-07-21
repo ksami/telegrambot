@@ -64,7 +64,6 @@ var ksamiBot = new Tbot(config['ksami'], function(message){
         }
         else{
             //unknown command
-            returnMessage += 'Unknown command, type /help to see a list of commands';
         }
     }
     return returnMessage;

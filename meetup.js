@@ -34,12 +34,15 @@ module.exports.STRINGS = {
 };
 
 
+// Parses text and returns the corresponding reply
+//params:
+//message - Message object containing the text
 module.exports.parse = function(message){
     
     var msg = message.text;
     var returnMessage = '';
 
-    if(typeof msg !== "undefined") {
+    if(typeof msg !== 'undefined') {
         text = msg.split(' ');
         command = text[0].split('@')[0];
 
